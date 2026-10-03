@@ -19,11 +19,11 @@ The Vite output directory is `dist/public`. Set `VITE_BASE=/REPOSITORY_NAME/` fo
 
 ## Content and image assets
 
-Story text and learning notes are maintained in `client/src/data/stories.json`. Illustration locations are mapped by numeric ID in `client/src/data/story-images.json`; the current mapping does not yet contain working, completed illustrations. The public route declaration lives in `client/public/manus-routes.json`.
+Story text and learning notes are maintained in `client/src/data/stories.json`. Illustration locations are mapped by numeric ID in `client/src/data/story-images.json`. The public route declaration lives in `client/public/manus-routes.json`.
 
 ## Illustration status
 
-The current Preview has not received any completed illustration files. The first five asynchronous requests did not produce visible artwork; the other 95 illustrations have not been requested while conserving credits. The site labels missing art rather than claiming a generated picture exists.
+Five new story illustrations have been requested for stories 1–5 and are pending in Managed Storage; their reserved URLs are already wired into the Preview. No images were requested for stories 6–100. Earlier image attempts did not produce visible artwork. If a request fails, the site shows its honest missing-art fallback.
 
 ## Privacy, accessibility, and advertising
 
