@@ -23,7 +23,7 @@ Story text and learning notes are maintained in `client/src/data/stories.json`. 
 
 ## Illustration status
 
-Five new story illustrations have been requested for stories 1–5 and are pending in Managed Storage; their reserved URLs are already wired into the Preview. No images were requested for stories 6–100. Earlier image attempts did not produce visible artwork. If a request fails, the site shows its honest missing-art fallback.
+Five new story illustrations for stories 1–5 and one separate homepage hero illustration have been requested; all are pending in Managed Storage and their reserved URLs are wired into the Preview. No illustrations were requested for stories 6–100. Earlier attempts did not produce visible artwork. If a request fails, the story cards show the missing-art fallback.
 
 ## Privacy, accessibility, and advertising
 
