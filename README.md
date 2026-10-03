@@ -1,14 +1,30 @@
-# Story Grove — A Little Story Library
+# Story Grove
 
-React / Express / tRPC / Drizzle starter, adapted from the Sandbox web-db-user template.
+A little story library for curious readers. Story Grove presents 100 original English children's stories across three grammar levels, with a browsable library, fixed-picture reader, browser read-aloud with active-paragraph highlighting, and reflection questions.
 
-- `pnpm dev`: development server; honors `PORT` (default 3000).
-- `pnpm build` / `pnpm start`: build and serve `dist/index.js` and `dist/public/`.
-- `pnpm db:migrate`: apply checked-in migrations. `pnpm db:push`: generate and apply new schema changes.
-- `pnpm check` / `pnpm test`: types and application tests.
+## Development
 
-Start with the Webdev skill's default-template guide. Platform login, storage, payments and service contracts live in its shared references; read the relevant capability before extending its helper.
+```bash
+pnpm install --frozen-lockfile
+pnpm dev:static
+```
 
-`server/_core/publicConfig.ts` exposes only named public runtime values. Private keys stay server-side. The platform serves managed `/manus-storage/` assets; the application does not register a second proxy.
+## Static production build
 
-Platform configuration is readable and editable through `webdev.config`. Default settings are initial values, not enforced constraints. The agent may modify the files, commands and configuration or follow the flexible guide for another stack.
+```bash
+pnpm build:static
+```
+
+The Vite output directory is `dist/public`. Set `VITE_BASE=/REPOSITORY_NAME/` for a GitHub Pages subpath or `/` when publishing at a domain root.
+
+## Content and image assets
+
+Story text and learning notes are maintained in `client/src/data/stories.json`. Illustration locations are mapped by numeric ID in `client/src/data/story-images.json`; the current mapping does not yet contain working, completed illustrations. The public route declaration lives in `client/public/manus-routes.json`.
+
+## Illustration status
+
+The current Preview has not received any completed illustration files. The first five asynchronous requests did not produce visible artwork; the other 95 illustrations have not been requested while conserving credits. The site labels missing art rather than claiming a generated picture exists.
+
+## Privacy, accessibility, and advertising
+
+This version does not load ad-network or analytics scripts. The advertising area is reserved and clearly labelled. AdSense activation requires the owner's approved publisher ID and any applicable consent configuration. The contact address supplied by the site owner appears on the Contact and Privacy pages.
