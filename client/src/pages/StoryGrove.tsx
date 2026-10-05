@@ -194,7 +194,7 @@ export default function StoryGrove() {
   const [storiesLoaded,setStoriesLoaded]=useState(false);
   const [storyData,setStoryData]=useState<FullStory>();
   const [storyLoadFailed,setStoryLoadFailed]=useState(false);
-  const clean=location.split("?")[0].split("#")[0]||"/";
+  const clean=(location.split("?")[0].split("#")[0]||"/").replace(/\/+$/,"")||"/";
   const storyMatch=clean.match(/^\/story\/(\d+)\/?$/);
   const storyId=storyMatch?Number(storyMatch[1]):undefined;
   const storyMeta=storyId?stories.find(s=>s.id===storyId):undefined;
