@@ -9,26 +9,53 @@ const template = await readFile(path.join(root, "index.html"), "utf8");
 const esc = (value = "") => String(value).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const setMeta = (html, selector, tag, attr, value) => {
   const safe = esc(value);
-  const pattern = new RegExp(`<meta\\s+${selector}=["'][^"']*["'][^>]*>`, "i");
+  const escapedTag = tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(`<meta\\s+${selector}=["']${escapedTag}["'][^>]*>`, "i");
   const replacement = `<meta ${selector}="${tag}" content="${safe}" />`;
   return pattern.test(html) ? html.replace(pattern, replacement) : html.replace("</head>", `  ${replacement}\n  </head>`);
 };
+const shortDescription = value => {
+  const text = String(value).replace(/\s+/g, " ").trim();
+  if (text.length <= 155) return text;
+  const cut = text.slice(0, 154);
+  const boundary = cut.lastIndexOf(" ");
+  return `${(boundary > 110 ? cut.slice(0, boundary) : cut).trimEnd()}…`;
+};
+const searchTitle = value => {
+  const brand = " — Story Grove";
+  let text = String(value).replace(/\s+/g, " ").trim();
+  const suffix = text.endsWith(brand) ? brand : "";
+  let base = suffix ? text.slice(0, -suffix.length).trimEnd() : text;
+  if (base.length + suffix.length > 60) base = `${base.slice(0, 59 - suffix.length).trimEnd()}…`;
+  if (base.length + suffix.length < 30) base = `${base} — English`;
+  return `${base}${suffix}`;
+};
 function documentFor({ title, description, route, body, image = "" }) {
-  let html = template.replace(/<title>.*?<\/title>/is, `<title>${esc(title)}</title>`);
-  html = setMeta(html, "name", "description", "content", description);
-  html = setMeta(html, "property", "og:title", "content", title);
-  html = setMeta(html, "property", "og:description", "content", description);
-  if (image) html = setMeta(html, "property", "og:image", "content", image.startsWith("http") ? image : origin + image);
+  const metaTitle = searchTitle(title);
+  let html = template.replace(/<title>.*?<\/title>/is, `<title>${esc(metaTitle)}</title>`);
+  const metaDescription = shortDescription(description);
+  html = setMeta(html, "name", "description", "content", metaDescription);
+  html = setMeta(html, "property", "og:title", "content", metaTitle);
+  html = setMeta(html, "property", "og:description", "content", metaDescription);
+  html = setMeta(html, "name", "twitter:title", "content", metaTitle);
+  html = setMeta(html, "name", "twitter:description", "content", metaDescription);
+  const absoluteImage = image ? (/^https?:\/\//i.test(image) ? image : origin ? `${origin}${image}` : "") : "";
+  if (absoluteImage) {
+    html = setMeta(html, "property", "og:image", "content", absoluteImage);
+    html = setMeta(html, "name", "twitter:image", "content", absoluteImage);
+  }
   if (origin) {
     const canonical = `${origin}${route}`;
-    if (/<link\\s+rel=["']canonical["'][^>]*>/i.test(html)) html = html.replace(/<link\\s+rel=["']canonical["'][^>]*>/i, `<link rel="canonical" href="${esc(canonical)}" />`);
-    else html = html.replace("</head>", `  <link rel="canonical" href="${esc(canonical)}" />\n    <meta property="og:url" content="${esc(canonical)}" />\n  </head>`);
+    const canonicalPattern = /<link\s+rel=["']canonical["'][^>]*>/i;
+    if (canonicalPattern.test(html)) html = html.replace(canonicalPattern, `<link rel="canonical" href="${esc(canonical)}" />`);
+    else html = html.replace("</head>", `  <link rel="canonical" href="${esc(canonical)}" />\n  </head>`);
+    html = setMeta(html, "property", "og:url", "content", canonical);
   }
   return html.replace('<div id="root"></div>', `<div id="root">${body}</div>`);
 }
 const storyLinks = stories.map(s => `<li><a href="/story/${s.id}/">${esc(s.title)}</a><span>Level ${s.level} · ${esc(s.category)}</span></li>`).join("\n");
 const homeBody = `<main><header><p>STORIES THAT GROW WITH YOU</p><h1>Every story opens a little world.</h1><p>Wander through 100 original English children's stories, with gentle grammar steps and little lessons to carry with you.</p></header><section><h2>The story shelves</h2><ol>${storyLinks}</ol></section><nav><a href="/about/">About</a> · <a href="/contact/">Contact</a> · <a href="/privacy/">Privacy</a></nav></main>`;
-const home = documentFor({ title: "Story Grove — A Little Story Library", description: "Wander through 100 original English children's stories, with gentle grammar steps and little lessons to carry with you.", route: "/", body: homeBody });
+const home = documentFor({ title: "Story Grove — A Little Story Library", description: "Wander through 100 original English children's stories, with gentle grammar steps and little lessons to carry with you.", route: "/", body: homeBody, image: "/manus-storage/async-images/KVVnFzxQzBG1lToc8AAE4s/image-1.webp" });
 await writeFile(path.join(root, "index.html"), home);
 for (const story of stories) {
   const storyText = story.text.split(/\n\s*\n/).map(p => `<p>${esc(p)}</p>`).join("\n");

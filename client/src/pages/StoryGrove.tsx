@@ -22,16 +22,26 @@ function storyPassages(text:string) {
 }
 
 function Meta({ title, description }: { title: string; description: string }) {
+  const brand = " — Story Grove";
+  const suffix = title.endsWith(brand) ? brand : "";
+  let baseTitle = suffix ? title.slice(0, -suffix.length).trimEnd() : title.trim();
+  if (baseTitle.length + suffix.length > 60) baseTitle = `${baseTitle.slice(0, 59 - suffix.length).trimEnd()}…`;
+  if (baseTitle.length + suffix.length < 30) baseTitle = `${baseTitle} — English`;
+  const pageTitle = `${baseTitle}${suffix}`;
+  const normalizedDescription = description.replace(/\s+/g, " ").trim();
+  const descriptionCut = normalizedDescription.slice(0, 154);
+  const descriptionBoundary = descriptionCut.lastIndexOf(" ");
+  const pageDescription = normalizedDescription.length <= 155 ? normalizedDescription : `${(descriptionBoundary > 110 ? descriptionCut.slice(0, descriptionBoundary) : descriptionCut).trimEnd()}…`;
   useEffect(() => {
-    document.title = title;
+    document.title = pageTitle;
     let meta = document.querySelector('meta[name="description"]');
     if (!meta) { meta = document.createElement("meta"); meta.setAttribute("name", "description"); document.head.appendChild(meta); }
-    meta.setAttribute("content", description.slice(0, 155));
+    meta.setAttribute("content", pageDescription);
     const ogTitle = document.querySelector('meta[property="og:title"]') || document.head.appendChild(Object.assign(document.createElement("meta"), { property: "og:title" }));
-    ogTitle.setAttribute("content", title);
+    ogTitle.setAttribute("content", pageTitle);
     const ogDesc = document.querySelector('meta[property="og:description"]') || document.head.appendChild(Object.assign(document.createElement("meta"), { property: "og:description" }));
-    ogDesc.setAttribute("content", description.slice(0, 200));
-  }, [title, description]);
+    ogDesc.setAttribute("content", pageDescription);
+  }, [pageTitle, pageDescription]);
   return null;
 }
 
