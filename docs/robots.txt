@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /api/*
+Sitemap: https://omdapay.github.io/story-grove-library/sitemap.xml

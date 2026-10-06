@@ -9,8 +9,10 @@ import imageManifest from "@/data/story-images.json";
 
 type Story = { id:number; title:string; summary:string; lesson:string; category:string; ageRange:string; level:number; grammarFocus:string; readingTimeMinutes:number; questions:string[]; sourceTopic?:string; text?:string };
 type FullStory = Story & { text:string };
-const imageFor = (id: number) => (imageManifest as Record<string, string>)[String(id)] || "";
 const assetsBase = import.meta.env.BASE_URL;
+const githubPages = import.meta.env.VITE_GITHUB_PAGES === "1";
+const imageFor = (id: number) => githubPages ? `${assetsBase}images/stories/${String(id).padStart(3, "0")}.webp` : (imageManifest as Record<string, string>)[String(id)] || "";
+const heroImage = githubPages ? `${assetsBase}images/hero.webp` : "/manus-storage/async-images/KVVnFzxQzBG1lToc8AAE4s/image-1.webp";
 const categories = ["All themes", "Kindness", "Courage", "Curiosity", "Friendship", "Patience", "Nature", "Honesty", "Perseverance", "Responsibility", "Learning"];
 function storyPassages(text:string) {
   return text.split(/\n\s*\n/).map(block=>block.trim()).filter(Boolean).flatMap(block=>{
@@ -103,7 +105,7 @@ function Library({ onOpen, stories, loading }: { onOpen: (id: number) => void; s
       <p>Wander through warm, original tales. Meet brave hearts, curious minds, and the little lessons that stay with us.</p>
       <button className="primary-button" onClick={() => document.getElementById("library")?.scrollIntoView({behavior:"smooth"})}>Find your next story <ArrowRight size={17}/></button>
       <div className="hero-note"><span>100</span> little adventures <i/> Three growing English levels</div>
-    </div><div className="hero-art"><img className="hero-image" src="/manus-storage/async-images/KVVnFzxQzBG1lToc8AAE4s/image-1.webp" alt="Two children share a storybook with a rabbit and bear beneath an old oak tree." fetchPriority="high" decoding="async"/><span className="hero-caption">a place for small wonders</span></div></div></section>
+    </div><div className="hero-art"><img className="hero-image" src={heroImage} alt="Two children share a storybook with a rabbit and bear beneath an old oak tree." fetchPriority="high" decoding="async"/><span className="hero-caption">a place for small wonders</span></div></div></section>
     <section className="grove-intro"><div className="section-overline">A GENTLE PATH THROUGH ENGLISH</div><p>Each story brings a new idea to explore — and a little more language to take along.</p><div className="level-pills"><span><i className="level-dot dot-1"/>Level 1 <small>ages 6–7</small></span><span><i className="level-dot dot-2"/>Level 2 <small>ages 7–8</small></span><span><i className="level-dot dot-3"/>Level 3 <small>ages 8–9</small></span></div></section>
     <section className="library-section" id="library"><div className="library-heading"><div><div className="section-overline">THE STORY SHELVES</div><h2>Choose a little adventure</h2><p>One page at a time, one new idea at a time.</p></div><div className="library-count"><Bookmark size={17}/><span>100 stories<br/><small>ready to be discovered</small></span></div></div>
       <div className="filters"><label className="search-box"><Search size={18}/><input value={query} onChange={e=>{setQuery(e.target.value);setShowAll(true)}} placeholder="Find a title, lesson, or grammar topic…" aria-label="Search stories"/>{query&&<button aria-label="Clear search" onClick={()=>setQuery("")}><X size={15}/></button>}</label>
@@ -189,12 +191,15 @@ function InfoPage({ path, onNavigate }: {path:string;onNavigate:(path:string)=>v
 }
 
 export default function StoryGrove() {
-  const [location,setLocation]=useLocation();
+  const [location,setLocationRaw]=useLocation();
+  const routeBase = assetsBase === "/" ? "" : assetsBase.replace(/\/+$/, "");
+  const routeLocation = routeBase && (location === routeBase || location.startsWith(`${routeBase}/`)) ? location.slice(routeBase.length) || "/" : location;
+  const setLocation = (path: string) => setLocationRaw(`${routeBase}${path.startsWith("/") ? path : `/${path}`}`);
   const [stories,setStories]=useState<Story[]>([]);
   const [storiesLoaded,setStoriesLoaded]=useState(false);
   const [storyData,setStoryData]=useState<FullStory>();
   const [storyLoadFailed,setStoryLoadFailed]=useState(false);
-  const clean=(location.split("?")[0].split("#")[0]||"/").replace(/\/+$/,"")||"/";
+  const clean=(routeLocation.split("?")[0].split("#")[0]||"/").replace(/\/+$/,"")||"/";
   const storyMatch=clean.match(/^\/story\/(\d+)\/?$/);
   const storyId=storyMatch?Number(storyMatch[1]):undefined;
   const storyMeta=storyId?stories.find(s=>s.id===storyId):undefined;

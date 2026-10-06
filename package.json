@@ -14,6 +14,7 @@
     "db:migrate": "drizzle-kit migrate",
     "dev:static": "vite --host 0.0.0.0 --port ${PORT:-3000} --strictPort",
     "build:static": "vite build && node scripts/prerender-stories.mjs",
+    "build:github-pages": "VITE_BASE=/story-grove-library/ VITE_PUBLIC_ORIGIN=https://omdapay.github.io/story-grove-library VITE_GITHUB_PAGES=1 pnpm build:static && cp -a docs/images dist/public/ && : > dist/public/.nojekyll && rm -rf docs && cp -a dist/public docs",
     "predev:static": "node scripts/prepare-stories.mjs",
     "prebuild:static": "node scripts/prepare-stories.mjs"
   },
