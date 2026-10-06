@@ -23,19 +23,11 @@ const imageFor = (id: number) => githubPages ? `${assetsBase}images/stories/${St
 const heroImage = githubPages ? `${assetsBase}images/hero.webp` : "/manus-storage/async-images/KVVnFzxQzBG1lToc8AAE4s/image-1.webp";
 const categories = ["All themes", "Kindness", "Courage", "Curiosity", "Friendship", "Patience", "Nature", "Honesty", "Perseverance", "Responsibility", "Learning"];
 const GA_MEASUREMENT_ID = "G-LW6QVNN11Z";
-function syncGoogleAnalyticsConsent(enabled: boolean) {
+function trackGoogleAnalyticsPageView() {
   if (typeof window === "undefined") return;
-  if (!enabled) {
-    window.gtag?.("consent", "update", { analytics_storage: "denied" });
-    const names = document.cookie.split(";").map(cookie => cookie.trim().split("=")[0]).filter(name => /^_ga(?:_|$)|^_gid$|^_gat(?:_|$)/.test(name));
-    for (const name of names) for (const path of ["/", "/story-grove-library/"]) document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}; SameSite=Lax; Secure`;
-    return;
-  }
   if (!window.storyGroveAnalyticsConfigured) {
     window.dataLayer = window.dataLayer || [];
     window.gtag = window.gtag || function () { window.dataLayer!.push(arguments); };
-    window.gtag("consent", "default", { analytics_storage: "denied", ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
-    window.gtag("consent", "update", { analytics_storage: "granted" });
     window.gtag("js", new Date());
     window.gtag("config", GA_MEASUREMENT_ID, { send_page_view: false });
     window.storyGroveAnalyticsConfigured = true;
@@ -44,8 +36,6 @@ function syncGoogleAnalyticsConsent(enabled: boolean) {
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
     document.head.appendChild(script);
-  } else {
-    window.gtag?.("consent", "update", { analytics_storage: "granted" });
   }
   window.gtag?.("event", "page_view", { page_path: `${window.location.pathname}${window.location.search}`, page_location: window.location.href, page_title: document.title });
 }
@@ -207,22 +197,21 @@ function StoryReader({ story, stories, onNavigate }: { story: FullStory; stories
 const legalContent: Record<string,{title:string;eyebrow:string;body:string[]}>={
   "/about":{title:"A little grove for growing minds.",eyebrow:"OUR LITTLE GROVE",body:["Story Grove is a home for original English children's stories, created to make reading feel like an invitation rather than an assignment.","Follow a gentle path through three reading levels, meet characters learning about friendship, courage, honesty, and care, and discover the grammar woven naturally into every tale.","Our stories are for sharing with a parent, teacher, or curious reader. The read-aloud voice is provided by your browser and is not a professional recording."]},
   "/contact":{title:"We'd love to hear from you.",eyebrow:"SAY HELLO",body:["For questions, corrections, or a kind note about the stories, write to us at the address below.","We aim to reply when we can. Please do not send sensitive personal information, especially information about children."]},
-  "/privacy":{title:"Your privacy matters here.",eyebrow:"PRIVACY POLICY",body:["Story Grove is designed as a public reading library. It does not ask children to create an account or submit personal details. Your optional analytics choice is stored locally in this browser.","Google Analytics 4 (measurement ID G-LW6QVNN11Z) is optional and is not requested until you enable Optional analytics in Cookie Preferences. It measures site visits and page views. You can withdraw consent there; this stops future measurement and clears accessible Google Analytics cookies. Google may process data under its own privacy terms.","Advertising is not active. If advertising is introduced in the future, this policy and the available consent choices will be updated before ad technology is activated. To ask a privacy question or request a correction, contact emadh5156@gmail.com. Do not include a child's sensitive information."]},
-  "/cookies":{title:"Choose what feels right.",eyebrow:"COOKIE PREFERENCES",body:["Optional analytics is off by default. If you enable it, Google Analytics 4 is loaded to measure visits and page views; your choice is stored in this browser. Turn it off here to stop future measurement and clear accessible Google Analytics cookies. No advertising cookies or ad network code are active."]},
+  "/privacy":{title:"Your privacy matters here.",eyebrow:"PRIVACY POLICY",body:["Story Grove is designed as a public reading library. It does not ask children to create an account or submit personal details.","Google Analytics 4 (measurement ID G-LW6QVNN11Z) runs automatically for all visitors to measure site visits and page views, and may use analytics cookies or similar identifiers. This site does not show an opt-in control. Google may process information under its own privacy terms; visitors can manage or block cookies in their browser settings.","Advertising is not active. If advertising is introduced in the future, this policy will be updated before ad technology is activated. To ask a privacy question or request a correction, contact emadh5156@gmail.com. Do not include a child's sensitive information."]},
+  "/cookies":{title:"Cookies and analytics.",eyebrow:"COOKIES & ANALYTICS",body:["Google Analytics 4 (measurement ID G-LW6QVNN11Z) is active automatically for all visitors and measures visits and page views. It may use analytics cookies or similar identifiers. This page is an informational disclosure; it does not provide a consent switch. You can manage or block cookies through your browser settings. No advertising cookies or ad network code are active."]},
   "/terms":{title:"A few kind ground rules.",eyebrow:"TERMS OF USE",body:["Story Grove is provided for personal, family, and classroom reading. Please use the stories and site respectfully and do not attempt to disrupt the service.","The stories and illustrations are provided for this library. Contact the owner before reproducing or redistributing them. Browser read-aloud depends on the visitor's device and installed voices.","The site is educational and is not a substitute for a teacher's professional judgment. These terms may be updated as the service changes."]},
   "/advertising":{title:"Room for thoughtful sponsors.",eyebrow:"ADVERTISING DISCLOSURE",body:["Story Grove currently reserves clearly labelled space for future advertising. No ad network code is active in this version.","If ads are introduced, they will be identified as advertising and kept visually separate from story text, navigation, and reading controls. We will not ask visitors to click ads.","Google AdSense approval is determined by Google and cannot be promised. Any advertising will be configured only after the publisher account, approved publisher ID, and any required consent-management setup are provided."]}
 };
 
 function SiteFooter({ onNavigate }: { onNavigate: (path:string)=>void }) {
-  const links=[["About","/about"],["Contact","/contact"],["Privacy","/privacy"],["Cookie preferences","/cookies"],["Terms","/terms"],["Advertising","/advertising"]];
+  const links=[["About","/about"],["Contact","/contact"],["Privacy","/privacy"],["Cookies & analytics","/cookies"],["Terms","/terms"],["Advertising","/advertising"]];
   return <footer className="site-footer"><div className="footer-main"><Brand onNavigate={onNavigate}/><p>Stories to enjoy.<br/>Little English to carry with you.</p><a className="footer-mail" href="mailto:emadh5156@gmail.com"><Mail size={15}/> emadh5156@gmail.com</a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Story Grove · Made for curious readers</span><nav aria-label="Legal and information pages">{links.map(([label,path])=><button key={path} onClick={()=>onNavigate(path)}>{label}</button>)}</nav></div></footer>;
 }
 
 function InfoPage({ path, onNavigate }: {path:string;onNavigate:(path:string)=>void}) {
-  const content=legalContent[path]; const [analytics,setAnalytics]=useState(()=>localStorage.getItem("sg-analytics") === "true");
-  const saveAnalytics=(enabled:boolean)=>{setAnalytics(enabled);localStorage.setItem("sg-analytics",String(enabled));window.dispatchEvent(new Event("storygrove:analytics-consent"))};
+  const content=legalContent[path];
   if(!content) return <main className="info-page"><div className="section-overline">NOT FOUND</div><h1>This page wandered off.</h1><button className="primary-button" onClick={()=>onNavigate("/")}>Back to the stories</button></main>;
-  return <><Meta title={`${content.eyebrow} — Story Grove`} description={content.body[0]}/><main className="info-page"><button className="back-link" onClick={()=>onNavigate("/")}><ArrowLeft size={16}/> Back to the grove</button><div className="info-paper"><div className="section-overline">{content.eyebrow}</div><h1>{content.title}</h1>{content.body.map((p,i)=><p key={i}>{p}</p>)}{path==="/contact"&&<a className="contact-address" href="mailto:emadh5156@gmail.com"><Mail size={18}/> emadh5156@gmail.com</a>}{path==="/cookies"&&<div className="cookie-choice"><label><span><strong>Optional analytics</strong><small>Google Analytics loads only after you opt in.</small></span><input type="checkbox" checked={analytics} onChange={e=>saveAnalytics(e.target.checked)}/></label><button className="primary-button" onClick={()=>saveAnalytics(analytics)}><Check size={16}/> Save preferences</button><p className="tiny-note">Turn this off at any time to stop future measurement and clear accessible Google Analytics cookies.</p></div>}</div></main></>;
+  return <><Meta title={`${content.eyebrow} — Story Grove`} description={content.body[0]}/><main className="info-page"><button className="back-link" onClick={()=>onNavigate("/")}><ArrowLeft size={16}/> Back to the grove</button><div className="info-paper"><div className="section-overline">{content.eyebrow}</div><h1>{content.title}</h1>{content.body.map((p,i)=><p key={i}>{p}</p>)}{path==="/contact"&&<a className="contact-address" href="mailto:emadh5156@gmail.com"><Mail size={18}/> emadh5156@gmail.com</a>}</div></main></>;
 }
 
 export default function StoryGrove() {
@@ -241,7 +230,7 @@ export default function StoryGrove() {
   const story=storyData?.id===storyId?storyData:undefined;
   const isInfo=clean in legalContent || clean==="/404";
   const isInvalidStory=clean.startsWith("/story/")&&storiesLoaded&&!storyMeta;
-  useEffect(()=>{const sync=()=>syncGoogleAnalyticsConsent(localStorage.getItem("sg-analytics")==="true");sync();window.addEventListener("storygrove:analytics-consent",sync);return()=>window.removeEventListener("storygrove:analytics-consent",sync)},[location]);
+  useEffect(()=>{trackGoogleAnalyticsPageView()},[location]);
   useEffect(()=>{let active=true;fetch(`${assetsBase}stories-index.json`).then(r=>{if(!r.ok)throw new Error("index fetch failed");return r.json() as Promise<Story[]>}).then(data=>{if(active)setStories(data)}).catch(()=>{if(active)setStories([])}).finally(()=>{if(active)setStoriesLoaded(true)});return()=>{active=false}},[]);
   useEffect(()=>{if(!storyId||!storyMeta){setStoryData(undefined);return}let active=true;setStoryLoadFailed(false);fetch(`${assetsBase}stories/${storyId}.json`).then(r=>{if(!r.ok)throw new Error("story fetch failed");return r.json() as Promise<FullStory>}).then(data=>{if(active)setStoryData(data)}).catch(()=>{if(active){setStoryLoadFailed(true);setStoryData(undefined)}});return()=>{active=false}},[storyId,storyMeta]);
   useEffect(()=>{if(location.includes("#")) setTimeout(()=>document.getElementById(location.split("#")[1])?.scrollIntoView(),80)},[location]);
